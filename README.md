@@ -9,5 +9,6 @@ This pipeline presents the code executed throughout the project:
 1. Scripts - The data preparation, GWAS, and C+T portion of the pipeline. 
 2. LDpred2 scripts- An alternative method of computing polygenic scores.
 3. Trans-ethnic scripts - Empirical comparison between the polygenic scores across genetic distance, polygenic score methods, and traits.
+4. Graphs - data visualizations.
 
   
