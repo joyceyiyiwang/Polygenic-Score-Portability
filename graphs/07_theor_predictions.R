@@ -150,13 +150,20 @@ ld_comp <- ld_components %>%
   geom_point(size=1.5,color="black")+
   geom_hline(aes(yintercept=den), linetype="dashed")+
   theme_bw()+
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=15,face="bold"),
+        strip.background = element_rect(colour="black", fill="white", 
+                                        size=1.5),
+        strip.text.x = element_text(size=12),
+        strip.text.y = element_text(size=12)
+  )+
   xlab("Within-Group Median Genetic Distance")+
-  ylab("Weighted LD Sum")+
+  ylab("Weighted LD Correlation")+
   facet_wrap(~group_type,scales="free_x")+
   scale_color_brewer(palette="Set1")+
   guides(color=F)
   
-ggsave("img1/ld_comp_numerator.png",ld_comp)
+ggsave("img1/ld_comp_numerator.png",ld_comp, width=8,height=6)
 
 ###################
 
@@ -277,7 +284,6 @@ for(i in c("Fst","WPC")){
     }
   }
 }
-print(paste0("Fst LD,",group,",",rel_r2,",",num,",",den))
 
 ##########################
 

@@ -576,19 +576,19 @@ rc_betas_graph <- rc_betas %>%
   ggplot(aes(x=Heritability,y=Coefficient,size=-log10(`p-val`),color=Heritability)) +
   geom_point()+
   scale_color_gradientn(colours = rev(sunset(9)))+
-  guides(color=F,size=guide_legend(title="-log10(p)"),
-         shape=guide_legend(title="Score Construction",override.aes = list(size=5)))+
+  guides(color=F,size=F)+
   theme_bw() +
-  theme(legend.text=element_text(size=14),
-        legend.title=element_text(size=16),
-        strip.background=element_rect(fill="white"),
-        strip.text = element_text(color="black",size=10),
-        axis.text.x = element_text(size=10),
-        axis.text.y = element_text(size=10),
-        axis.title=element_text(size=14))+
+  theme(
+        strip.background=element_rect(fill="white",size=1.5,color="black"),
+        strip.text = element_text(color="black",size=12),
+        axis.text.x = element_text(size=12),
+        axis.text.y = element_text(size=12),
+        axis.title=element_text(size=15,face="bold"))+
   ylab("Slope")+
+  xlab("Trait Heritability")+
   facet_wrap(~gd, scales = 'free_y')+
-  labs(caption="Slopes computed from a linear regression between relative partial R2 and within-group median genetic distance.")
+  scale_x_continuous(breaks = c(0.2,0.3,0.4,0.5), limits=c(0.15,0.5))
+  #labs(caption="Slopes computed from a linear regression between relative partial R2 and within-group median genetic distance.")
 
-ggsave("img1/rc_betas.png",rc_betas_graph,width=12,height=8,dpi=500)
+ggsave("img1/rc_betas.png",rc_betas_graph,width=10,height=8,dpi=500)
 
