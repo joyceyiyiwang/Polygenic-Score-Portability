@@ -10,6 +10,7 @@ library(gridExtra)
 library(RColorBrewer)
 library(philentropy)
 library(qqman)
+library(boot)
 
 non_prs_df <- read_tsv('data/prs_comparisons2/non_prs_df.tsv')
 prs_fst_df <- read_tsv('data/prs_comparisons2/UKBB_geno_fst_CT.tsv')
@@ -59,6 +60,65 @@ non_prs_df_sub <- non_prs_df %>%
   rename("WPC Group"= "WPC_groups") %>%
   mutate(phenotype=factor(phenotype,levels=c("Height","Platelet","MCV","MCH","BMI","RBC","Monocyte",
                                              "Lymphocyte","WBC","Eosinophil"))) %>%
+  select(`Fst Group`, mean_fst,
+         `WPC Group`, mean_wpc,
+         phenotype,phenotype_value)
+
+
+mean_sample <- function(d,i){
+  d2 <- d[i,] %>% pull(phenotype_value)
+  return(mean(d2,na.rm=T))
+}
+
+
+var_sample <- function(d, i){
+  d2 <- d[i,] %>% pull(phenotype_value)
+  return(var(d2,na.rm=T))
+}
+
+extract_cis <- function(boot_obj){
+  values <- boot_obj$percent[c(4,5)]
+  return(paste0(values[1],",",values[2]))
+}
+
+set.seed(626)
+df_boot_fst <- non_prs_df_sub %>%
+  group_by(`Fst Group`, phenotype) %>%
+  do(
+    boot_mean = boot(.,mean_sample,R=500),
+    boot_var = boot(.,var_sample,R=500)
+  ) %>%
+  ungroup() %>%
+  mutate(mean_ci = unlist(lapply(lapply(boot_mean,boot.ci,type="perc"),extract_cis))) %>%
+  mutate(var_ci = unlist(lapply(lapply(boot_var,boot.ci,type="perc"),extract_cis))) %>%
+  select(-boot_mean,-boot_var) %>%
+  pivot_longer(mean_ci:var_ci,names_to="stat",values_to="ci") %>%
+  separate(ci, into = c("Min", "Max"), sep = ",") %>%
+  mutate(stat = factor(stat,levels=c("mean_ci","var_ci"),labels=c("Mean","Variance"))) %>%
+  mutate_if(is.character,as.numeric) %>%
+  rename("Group"=`Fst Group`)
+
+set.seed(626)
+df_boot_wpc <- non_prs_df_sub %>%
+  group_by(`WPC Group`, phenotype) %>%
+  do(
+    boot_mean = boot(.,mean_sample,R=500),
+    boot_var = boot(.,var_sample,R=500)
+  ) %>%
+  ungroup() %>%
+  mutate(mean_ci = unlist(lapply(lapply(boot_mean,boot.ci,type="perc"),extract_cis))) %>%
+  mutate(var_ci = unlist(lapply(lapply(boot_var,boot.ci,type="perc"),extract_cis))) %>%
+  select(-boot_mean,-boot_var) %>%
+  pivot_longer(mean_ci:var_ci,names_to="stat",values_to="ci") %>%
+  separate(ci, into = c("Min", "Max"), sep = ",") %>%
+  mutate(stat = factor(stat,levels=c("mean_ci","var_ci"),labels=c("Mean","Variance"))) %>%
+  mutate_if(is.character,as.numeric)%>%
+  rename("Group"=`WPC Group`)
+
+
+######################################################
+
+non_prs_df_sub <- non_prs_df_sub %>%
   group_by(`Fst Group`,phenotype) %>%
   mutate(fst_pheno_mean = mean(phenotype_value,na.rm=T)) %>%
   mutate(fst_pheno_var = var(phenotype_value,na.rm=T)) %>%
@@ -70,39 +130,49 @@ non_prs_df_sub <- non_prs_df %>%
   select(`Fst Group`,mean_fst, phenotype, fst_pheno_mean,fst_pheno_var,
          `WPC Group`,mean_wpc,phenotype,wpc_pheno_mean,wpc_pheno_var) 
 
-
-######################################################
-
 top5 <- c("Height","Platelet","MCV","MCH","BMI")
 
 fst_stats <- non_prs_df_sub %>%
   distinct(`Fst Group`,phenotype,.keep_all=T) %>%
+  select(`Fst Group`,mean_fst,phenotype, fst_pheno_mean,fst_pheno_var) %>%
   pivot_longer(fst_pheno_mean:fst_pheno_var,names_to="stat",values_to="value") %>%
   mutate(stat = ifelse(stat=="fst_pheno_mean","Mean","Variance")) %>%
+  mutate(stat = factor(stat,labels=c("Mean","Variance"))) %>%
   mutate(top5 = ifelse((phenotype %in% top5),"Top 5","Bottom 5")) %>%
   mutate(GD = "Fst") %>%
   rename("Group" = "Fst Group") %>%
-  rename("Median" = "mean_fst")
+  rename("Median" = "mean_fst") %>%
+  left_join(df_boot_fst,by=c("Group","phenotype","stat"))
 
 wpc_stats <- non_prs_df_sub %>%
   distinct(`WPC Group`,phenotype,.keep_all=T) %>%
+  select(`WPC Group`,mean_wpc,phenotype, wpc_pheno_mean,wpc_pheno_var) %>%
   pivot_longer(wpc_pheno_mean:wpc_pheno_var,names_to="stat",values_to="value") %>%
   mutate(stat = ifelse(stat=="wpc_pheno_mean","Mean","Variance")) %>%
+  mutate(stat = factor(stat,labels=c("Mean","Variance"))) %>%
   mutate(top5 = ifelse((phenotype %in% top5),"Top 5","Bottom 5")) %>%
   mutate(GD = "WPC") %>%
   rename("Group" = "WPC Group") %>%
-  rename("Median" = "mean_wpc")
+  rename("Median" = "mean_wpc")%>%
+  left_join(df_boot_wpc,by=c("Group","phenotype","stat"))
 
+summary_stats <- fst_stats %>%
+  bind_rows(wpc_stats)
+summary_stats %>% write_tsv("data/prs_comparisons2/summary_stats.tsv")
 
 for(i in c("Mean","Variance")){
 
   if(i=="Mean"){
     yint <- 0
-    ilabel <- "Phenotype Mean"
+    ylabel <- "Phenotype Mean"
+    ymin1 <- -1.5
+    ymax1 <- .75
     }
   else{
     yint <- 1
     ylabel <- "Phenotype Variance"
+    ymin1 <- 0
+    ymax1 <- 3
     }
   
 pheno_graph <- fst_stats %>%
@@ -110,11 +180,14 @@ pheno_graph <- fst_stats %>%
   mutate(top5 = factor(top5,levels=c("Top 5","Bottom 5"))) %>%
   filter(stat ==i) %>%
   ggplot(aes(x=Median,y=value,group=phenotype,color=phenotype)) +
-  geom_line(size=1.5)+
+  geom_line(size=1)+
+  geom_errorbar(aes(ymin=Min,ymax=Max),size=0.5, alpha=0.4)+
+  geom_point(size=.5,color="black")+
 #  geom_point(size=2, color="black")+
   geom_hline(yintercept=yint, linetype="dashed") +
   theme_classic()+
-  ylab("Phenotype Variance")+
+  ylab(ylabel)+
+  coord_cartesian(ylim=c(ymin1, ymax1))+
   xlab("Within-Group Median Genetic Distance")+
   theme(axis.text=element_text(size=16),
         axis.title=element_text(size=18,face="bold"),
@@ -125,11 +198,13 @@ pheno_graph <- fst_stats %>%
         strip.text.x = element_text(size=20),
         strip.text.y = element_text(size=20)
         )+
-  scale_color_discrete(name = "Phenotype")+
+  scale_color_discrete(name="Trait")+
+#scale_color_brewer(palette="Paired")+
+ # scale_color_discrete(name = "Phenotype")+
   facet_wrap(GD~top5, scales="free_x")+
   guides(color=guide_legend(override.aes = list(size=12)))
 
-ggsave(paste0("img1/FINAL_combined_",i,".png"),pheno_graph,
+ggsave(paste0("img1/FINAL_combined_",i,"_errors1.png"),pheno_graph,
        width=20,height=16,dpi=1250)
 }  
 

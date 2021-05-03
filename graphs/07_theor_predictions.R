@@ -135,6 +135,28 @@ ld <- read_csv("theor_ld/ld.txt",
   arrange(GD,group_number) %>%
   rename("group_type"="GD")
 
+ld_components <- read_csv("theor_ld/ld_components.txt",
+               col_names=c("GD","group_number","LD","num","den"))%>%
+  mutate(GD = factor(GD,labels=c("Fst","WPC"))) %>%
+  mutate(den = parse_number(den)) %>%
+  arrange(GD,group_number) %>%
+  rename("group_type"="GD") %>%
+  left_join(median_values, by=c("group_type","group_number"))
+
+ld_comp <- ld_components %>%
+  mutate(clr = ifelse(group_type=="Fst","red","blue")) %>%
+  ggplot(aes(x=median,y=num,color=group_type)) +
+  geom_line(size=1)+
+  geom_point(size=1.5,color="black")+
+  geom_hline(aes(yintercept=den), linetype="dashed")+
+  theme_bw()+
+  xlab("Within-Group Median Genetic Distance")+
+  ylab("Weighted LD Sum")+
+  facet_wrap(~group_type,scales="free_x")+
+  scale_color_brewer(palette="Set1")+
+  guides(color=F)
+  
+ggsave("img1/ld_comp_numerator.png",ld_comp)
 
 ###################
 
@@ -164,6 +186,78 @@ herit <- herit_tibble %>%
 
 ###################
 
+sumstats_fst <- sumstats %>% filter(group_type=="Fst") %>%left_join(mean_fst_values,by="group_number")
+s_fst <- sumstats_fst %>%
+  ggplot(aes(x=median,y=sumstat,color=threshold))+
+  geom_point(size=1)+
+  xlab("Within-Group Median Fst")+
+  ylab("Term iv")+
+  geom_vline(xintercept=quantile(sumstats_fst$median,probs=c(0.25,0.5,0.75)), linetype="dashed")+
+  facet_wrap(~phenotype)
+
+ggsave("img1/theor_term_iv.png",s_fst)
+
+ld_fst <- ld %>% filter(group_type=="Fst") %>% select(-group_type) %>% left_join(mean_fst_values,by="group_number")
+ld_fst1 <- ld_fst %>%
+  ggplot(aes(x=median,y=LD))+
+  geom_point(size=1)+
+  xlab("Within-Group Median Fst")+
+  ylab("Term iii")+
+  geom_vline(xintercept=quantile(ld_fst$median,probs=c(0.25,0.5,0.75)), linetype="dashed")
+
+ggsave("img1/theor_term_iii.png",ld_fst1)
+
+herit_fst <- herit %>% filter(group_type=="Fst") %>% select(-group_type) %>% left_join(mean_fst_values,by="group_number")
+h_fst1 <- herit_fst %>%
+  ggplot(aes(x=median,y=rel_h2))+
+  geom_point(size=1)+
+  xlab("Within-Group Median Fst")+
+  ylab("Term ii (Relative Heritability")+
+  facet_wrap(~phenotype)+
+  geom_vline(xintercept=quantile(ld_fst$median,probs=c(0.25,0.5,0.75)), linetype="dashed")
+
+ggsave("img1/theor_term_ii.png",h_fst1)
+#######################
+
+het <- tibble()
+
+for (file in list.files(path = 'data/theory',
+                        pattern = '[a-z]{3}_[0-9]+.het', full.names = T)) {
+  het_file <- read.table(file, sep = "" , header = T,stringsAsFactors = F) %>%
+  mutate(group_number = parse_number(file)) %>%
+  mutate(group_type = str_extract(file,"fst|wpc"))
+  het <- het %>% bind_rows(het_file)
+  
+}
+  
+het1 <- het %>% group_by(group_type,group_number) %>%
+  summarize(mean_O = mean(O.HOM.,na.rm=T),
+            mean_E = mean(E.HOM.,na.rm=T)) %>%
+  ungroup() %>%
+  mutate(mean_O_1 = max(mean_O*(group_number==1))) %>%
+  mutate(rel_mean_O = mean_O / mean_O_1) %>%
+  mutate(group_type = factor(group_type,labels=c("Fst","WPC"), levels=c("fst","wpc"))) %>%
+  left_join(median_values,by=c("group_type","group_number"))
+
+homo_graph <- het1 %>%
+#  pivot_longer(mean_O:mean_E,names_to="Homozygosity",values_to="Values") %>%
+#  mutate(Homozygosity = factor(Homozygosity,levels=c("mean_E","mean_O"),labels=c("Expected","Observed")))%>%
+#  filter(Homozygosity =="Observed") %>%
+  ggplot(aes(x=median,y=rel_mean_O,color=group_type))+
+  geom_line(size=1)+
+  geom_point(size=1.5,color="black")+
+  scale_color_brewer(palette="Set1")+
+  theme_bw()+
+  xlab("Within-Group Median Genetic Distance")+
+  ylab("Relative Average of Observed # of Homozyg. Genotypes per Sample")+
+  facet_wrap(~group_type,scales="free_x")
+ggsave("img1/homozygosity.png",homo_graph)
+
+####################
+
+
+##################
+
 pred <- sumstats %>%
   left_join(ld, by=c("group_type","group_number")) %>%
   left_join(herit, by=c("group_type","group_number","phenotype")) %>%
@@ -183,6 +277,7 @@ for(i in c("Fst","WPC")){
     }
   }
 }
+print(paste0("Fst LD,",group,",",rel_r2,",",num,",",den))
 
 ##########################
 
