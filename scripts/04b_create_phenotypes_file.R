@@ -30,12 +30,8 @@ AMR_df <- read_delim('data/ukb_populations/AMR_all.txt', delim = ' ', trim_ws = 
 EAS_df <- read_delim('data/ukb_populations/EAS_all.txt', delim = ' ', trim_ws = T)
 SAS_df <- read_delim('data/ukb_populations/SAS_all.txt', delim = ' ', trim_ws = T)
 
-
-eur_all <- read_delim('data/ukb_populations/EUR_all.txt', delim = ' ', trim_ws = T)
+eur_train <- read_delim('data/ukb_populations/EUR_all.txt', delim = ' ', trim_ws = T)
 eur_test <- read_delim('data/ukb_populations/EUR_test.txt', delim = ' ', trim_ws = T)
-eur_train <- eur_all %>%
-  anti_join(eur_test, by = c('#FID', 'IID'))
-
 
 combined_labels <- bind_rows(
   eur_train %>% mutate(pop = 'EUR_train'),
@@ -65,19 +61,6 @@ for (i in traits){
 
     pheno_df[,i] <- (pheno_df[,i]-eur_mean)/eur_sd
 }
-
-#for (i in traits) {
-#plot_df <-pheno_df[,c(i,"pop")] %>% filter(pop!="EUR_train")
-#
-#plot <- plot_df %>% ggplot() +
-#	geom_histogram(aes(plot_df[[1]]),color="black", fill="white",bins=15) + 
-#    	facet_grid(cols = vars(pop))+
-#	theme_light() + 
-#    	xlab(i) 
-#
-#plot_name <- paste0("img/trait_distributions/",i,"_hist_std_norm.png")
-#ggsave(plot_name,plot,,width=10,height=8)
-#}
 
 pheno_df %>% select('#FID', IID, all_of(traits)) %>%
 	write_delim('data/phenotypes/full_phenotypes.pheno', delim = ' ', na = 'NA')

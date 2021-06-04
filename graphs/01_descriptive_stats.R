@@ -357,8 +357,6 @@ ggsave("img1/FINAL_fst_wpc.png",scatter_plot,
 
 #####################################################
 
-
-
 covar_df  <- read_tsv('data/ukb_merged/covar_all_samples.covar') %>% select(`#FID`,IID,PC1_AVG,PC2_AVG,pop)
 wb_df <- read.table('data/ukb_merged/wb.fam') %>% select(V1,V2)
 colnames(wb_df) <- c("#FID","IID")

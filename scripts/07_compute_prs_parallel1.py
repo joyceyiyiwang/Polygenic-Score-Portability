@@ -1,6 +1,5 @@
 import os
 
-
 variable = """#!/bin/bash
 #
 #SBATCH --account=mfplab

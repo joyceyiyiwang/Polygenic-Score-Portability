@@ -14,15 +14,20 @@ mkdir data/ambiguous_indel_snps \
       data/ukb_filtered \
       data/ukb_merged \
       data/ukb_meta \
-      data/ukb_populations \
+      data/ukb_populations \ #will include separated pop groups
       data/models \
       data/phenotypes \
       data/gwas_results \
-      data/prs \
+      data/prs \ #only scores from C+T approach
       data/kgp_populations \
       data/fst \ 
-      data/LDpred \
-      data/LDpred/prs \
-      data/prs_comparisons \ 
+      data/LDpred \ 
+      data/LDpred/prs \ #contains PRS for target individuals
+      data/LDpred/tmp-data \ #memory storage for LDpred code
+      data/LDpred/val_prs \ #contains PRS for validation set
+      data/prs_comparisons \ #contains agg data from C+T & LDpred
+      data/theory \  #LD & MAF patterns from target groups
+      data/theor_herit \  #LDSC results to calculate h2
+      data/theoretical \ #Destination of results from theor predictions
       img \
-      ldpred_scripts
+

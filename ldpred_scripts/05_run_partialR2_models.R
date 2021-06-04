@@ -262,8 +262,6 @@ ld_wpc_df <- read_tsv('data/prs_comparisons2/UKBB_geno_wpc_LD.tsv')
 prs_pop_df <- read_tsv('data/prs_comparisons2/UKBB_geno_pop.tsv')
 #######################
 
-
-
 groups <- unique(non_prs_df$weighted_fst_groups) %>% sort()
 groups1 <- unique(non_prs_df$WPC_groups) %>% sort()
 

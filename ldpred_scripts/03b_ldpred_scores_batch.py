@@ -15,8 +15,8 @@ phenotype={}
 """
 
 fixed = """# Create PRS score files for several p-value thresholds. Files numbered 0-4, corresponding values above.
-for i in 6 $(seq 8 28);
-#for i in 6 28;
+for i in $(seq 8 27);
+#for i in 6 $(seq 8 28);
 do
 $plink2 \
 --bfile data/LDpred1/LD_EUR_merged \

@@ -14,7 +14,7 @@ def grouper(iterable, n, fillvalue=None):
 
 def submit_batch_fst_computation(group_label, test_fids, temp_dir):
     """
-    Batch Fst computations. We have ~32,000 test individuals and would rather
+    Batch Fst computations. We have ~32,000 test non-EUR individuals and would rather
     submit O(100) jobs than 32,000 jobs.
     """
     formatted_fids = ' '.join([str(i) for i in test_fids])
@@ -24,12 +24,13 @@ def submit_batch_fst_computation(group_label, test_fids, temp_dir):
         "#SBATCH --account=mfplab\n"
         f"#SBATCH --job-name=fst{group_label}\n"
         "#SBATCH -c 1\n"
-        "#SBATCH --time=5-00:00:00\n"
+        "#SBATCH --time=4-00:00:00\n"
         "#SBATCH --mem-per-cpu=8gb\n\n"
+        "plink='rigel/mfplab/users/jm4454/plink/plink'\n"
         f"group={group_label}\n"
         f"for test_fid in {formatted_fids}\n"
         "do\n"
-        "  /rigel/mfplab/users/jm4454/plink/plink "
+        "  $plink "
         "  --bim data/ukb_merged/merged.bim "
         "  --bed data/ukb_merged/merged.bed "
         "  --fam data/ukb_merged/merged_fst.fam "

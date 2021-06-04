@@ -1,4 +1,3 @@
-
 import os
 
 variable = """#!/bin/bash
@@ -15,7 +14,7 @@ phenotype={}
 """
 
 fixed = """# Create PRS score files for several p-value thresholds. Files numbered 0-4, corresponding values above.
-for i in 6 28 29
+for i in 6 28 29 # 6 - original betas, 28 - average of 20 sets, 29 - average of filtered sets
 do
 $plink2 \
 --bfile data/ukb_merged/merged \
@@ -35,7 +34,8 @@ def main(phenotype):
 
 
 if __name__ == "__main__":
-    phenotypes = ['BMI','Height','RBC', 'Platelet', 'MCV', 'Monocyte', 'WBC', 'MCH', 'Eosinophil', 'Lymphocyte']
+    phenotypes = ['BMI','Height','RBC', 'Platelet', 'MCV', 'Monocyte', 'WBC', 'MCH', 'Eosinophil', 'Lymphocyte',
+                  'DBP','SBP','Hb','Ht','MCHC','Neutrophil','Basophil']
     for phenotype in phenotypes:
         with open(f'ldpred_scripts/temp_scripts/{phenotype}.sh', 'w') as f:
             f.write(main(phenotype))

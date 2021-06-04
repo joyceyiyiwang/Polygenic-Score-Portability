@@ -7,10 +7,13 @@ library(bigsnpr)
 library(Matrix)
 library(tidyverse)
 
-tsv_file <- paste0("data/LDpred1/","{}","_merged_sumstats_ldpred.tsv")
+phenotype <- "{}"
+tsv_file <- paste0("data/LDpred1/",phenotype,"_merged_sumstats_ldpred.tsv")
 sumstats <- read_tsv(tsv_file)
 
 tmp <- tempfile(tmpdir = "data/LDpred1/tmp-data")
+
+print("Calculating Correlation Matrices")
 
 for (chr in 1:22){{
   
@@ -44,14 +47,17 @@ for (chr in 1:22){{
 
 
 #### Retrieve initial heritability estimate
-
+print("Heritability estimates")
 (ldsc <- with(df_beta, snp_ldsc(ld, length(ld), chi2 = (beta / beta_se)^2,
                                 sample_size = n_eff, blocks = NULL)))
 (ld_h2_est <- ldsc[["h2"]])
 
-h2_table <- tibble(Trait=c("Height","Platelet","MCV","MCH","BMI","RBC","Monocyte","WBC","Eosinophil","Lymphocyte"),
-                   h2 = c(0.485,0.308,0.267,0.253,0.248,0.234,0.230,0.191,0.184,0.210))
-(h2_est <- h2_table[h2_table$Trait=="{}",2] %>% pull(h2))
+h2_table <- tibble(
+Trait=c("Height","Platelet","MCV","MCH","BMI","RBC","Monocyte","WBC","Eosinophil","Lymphocyte",
+        "DBP","SBP","Hb","Ht","MCHC","Neutrophil","Basophil"),
+h2 = c(0.485,0.308,0.267,0.253,0.248,0.234,0.230,0.191,0.184,0.210,
+        0.143,0.151,0.1054,0.0942,0.0532,0.164,0.0242))
+(h2_est <- h2_table[h2_table$Trait==phenotype,2] %>% pull(h2))
 
 ####### LDpred Auto
 print("LDpred - auto beginning")
@@ -71,18 +77,16 @@ sumstats1 <- sumstats %>%
   mutate(average_BETA=final_beta_auto) %>%
   select(-a0,-a1,-beta_se,-p,-n_eff)
 
-export_file <- paste0("data/LDpred1/","{}","_ldpred_auto_results.tsv")
+export_file <- paste0("data/LDpred1/",phenotype,"_ldpred_auto_results.tsv")
 sumstats1 %>% write_tsv(export_file)
 
 p_auto <- sapply(multi_auto, function(auto) auto$p_est)
-export_file <- paste0("data/LDpred1/","{}","_ldpred_auto_p_est.tsv")
+export_file <- paste0("data/LDpred1/",phenotype,"_ldpred_auto_p_est.tsv")
 p_auto %>% as.data.frame() %>% write_tsv(export_file)
 
 h2_auto <- sapply(multi_auto, function(auto) auto$h2_est)
-export_file <- paste0("data/LDpred1/","{}","_ldpred_auto_h2_est.tsv")
+export_file <- paste0("data/LDpred1/",phenotype,"_ldpred_auto_h2_est.tsv")
 h2_auto %>% as.data.frame() %>% write_tsv(export_file)
-
-
 
 """
 
@@ -98,16 +102,17 @@ module load anaconda
 module load R
 source activate prs1
 
-Rscript ldpred_scripts/temp_scripts/{}.R
-rm ldpred_scripts/temp_scripts/{}.R
-rm ldpred_scripts/{}.sh
+pheno='{}'
+Rscript ldpred_scripts/temp_scripts/${pheno}.R
+rm ldpred_scripts/temp_scripts/${pheno}.R
+rm ldpred_scripts/${pheno}.sh
 """
 
 def main1(phenotype):
-    return rscript.format(phenotype,phenotype,phenotype,phenotype, phenotype)
+    return rscript.format(phenotype)
 
 def main2(phenotype):
-    return variable.format(phenotype,phenotype,phenotype, phenotype)
+    return variable.format(phenotype,phenotype)
 
 if __name__ == "__main__":
     phenotypes = ['BMI','Height' ,'RBC', 'Platelet', 'MCV', 'Monocyte', 'WBC', 'MCH', 'Eosinophil', 'Lymphocyte']

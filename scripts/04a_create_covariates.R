@@ -3,11 +3,11 @@ library(tidyverse)
 
 #Import Covariates
 
-sex_df = read_table('/rigel/mfplab/projects/ukb_hakhamanesh/phenotype_data/extracted_phenotypes/ukb.sex.txt',
+sex_df <- read_table('/rigel/mfplab/projects/ukb_hakhamanesh/phenotype_data/extracted_phenotypes/ukb.sex.txt',
 col_names=c("IID","is_male"))
-age_df = read_table('/rigel/mfplab/projects/ukb_hakhamanesh/phenotype_data/extracted_phenotypes/ukb.age.txt',
+age_df <- read_table('/rigel/mfplab/projects/ukb_hakhamanesh/phenotype_data/extracted_phenotypes/ukb.age.txt',
 col_names=c('IID', 'age'))
-pc_df = read_tsv('data/ukb_merged/projection.sscore')
+pc_df <- read_tsv('data/ukb_merged/projection.sscore')
 
 df <- sex_df %>% full_join(age_df,by="IID") %>% full_join(pc_df,by="IID")
 df <- df %>%
@@ -28,11 +28,8 @@ AMR_df <- read_delim('data/ukb_populations/AMR_all.txt', delim = ' ', trim_ws = 
 EAS_df <- read_delim('data/ukb_populations/EAS_all.txt', delim = ' ', trim_ws = T)
 SAS_df <- read_delim('data/ukb_populations/SAS_all.txt', delim = ' ', trim_ws = T)
 
-
-eur_all <- read_delim('data/ukb_populations/EUR_all.txt', delim = ' ', trim_ws = T)
+eur_train <- read_delim('data/ukb_populations/EUR_all.txt', delim = ' ', trim_ws = T)
 eur_test <- read_delim('data/ukb_populations/EUR_test.txt', delim = ' ', trim_ws = T)
-eur_train <- eur_all %>%
-  anti_join(eur_test, by = c('#FID', 'IID'))
 
 combined_labels <- bind_rows(
   eur_train %>% mutate(pop = 'EUR_train'),
@@ -49,16 +46,14 @@ df_pop <- df %>%
 
 # Standard normalize with respect to training EUR population
 
-covar = df_pop %>% select(-`#FID`,-IID,-pop) %>% colnames()
+covar <- df_pop %>% select(-`#FID`,-IID,-pop) %>% colnames()
 
 train_eur_df <- df_pop %>% filter(pop=="EUR_train")
 
 for (i in covar){
 eur_mean <- train_eur_df %>% pull(i) %>% mean(na.rm=T)
 eur_sd <- train_eur_df %>% pull(i) %>% sd(na.rm=T)
-
 df_pop[,i] <- (df_pop[,i]-eur_mean)/eur_sd
-
 }
 
 # Export file

@@ -104,23 +104,23 @@ pop_med <- non_prs_df %>%
 
 ######################
 
-sumstats_ct <- read_csv("theor_sumstats_ct/sumstats_ct.txt",
+sumstats_ct <- read_csv("data/theoretical/ct_sumstats.txt",
                         col_names=c("GD","group_number","phenotype","threshold","sumstat")) %>%
   mutate(sumstat = parse_number(sumstat)) %>%
   mutate(threshold = as.character(threshold)) %>%
   mutate(GD=str_extract(GD,"[a-zA-Z]{3}"))
 
-sumstats_height <- read_csv("theor_sumstats/height_ldpred_sumstats.txt",
-                     col_names=c("GD","group_number","sumstat"))%>%
-  mutate(sumstat=parse_number(sumstat)) %>%
-  mutate(phenotype="Height") %>%
-  mutate(GD=str_extract(GD,"[a-zA-Z]{3}"))
+#sumstats_height <- read_csv("data/theoretical/height_ldpred_sumstats.txt",
+#                     col_names=c("GD","group_number","sumstat"))%>%
+#  mutate(sumstat=parse_number(sumstat)) %>%
+#  mutate(phenotype="Height") %>%
+#  mutate(GD=str_extract(GD,"[a-zA-Z]{3}"))
 
-sumstats <- read_csv("theor_sumstats/platelet_mcv_ldpred_sumstats.txt",
+sumstats <- read_csv("data/theoretical/ldpred_sumstats.txt",
                      col_names=c("GD","group_number","sumstat","phenotype")) %>%
   mutate(phenotype=str_extract(phenotype,"[a-zA-Z]+")) %>%
   mutate(GD = str_extract(GD,"[a-zA-Z]{3}")) %>%
-  bind_rows(sumstats_height) %>%
+ # bind_rows(sumstats_height) %>%
   mutate(threshold="LDpred") %>%
   bind_rows(sumstats_ct) %>%
   mutate(GD = factor(GD,labels=c("Fst","WPC"))) %>%
@@ -128,13 +128,15 @@ sumstats <- read_csv("theor_sumstats/platelet_mcv_ldpred_sumstats.txt",
 
 ####################
 
-ld <- read_csv("theor_ld/ld.txt",
+ld <- read_csv("data/theoretical/ld.txt",
                col_names=c("GD","group_number","LD"))%>%
   mutate(LD=parse_number(LD)) %>%
   mutate(GD = factor(GD,labels=c("Fst","WPC"))) %>%
   arrange(GD,group_number) %>%
   rename("group_type"="GD")
 
+components <- function(){
+#Need to extract num and den from output files
 ld_components <- read_csv("theor_ld/ld_components.txt",
                col_names=c("GD","group_number","LD","num","den"))%>%
   mutate(GD = factor(GD,labels=c("Fst","WPC"))) %>%
@@ -164,12 +166,13 @@ ld_comp <- ld_components %>%
   guides(color=F)
   
 ggsave("img1/ld_comp_numerator.png",ld_comp, width=8,height=6)
+}
 
 ###################
 
 herit_tibble <- tibble()
 
-for (file in list.files(path = 'theor_herit',
+for (file in list.files(path = 'data/theoretical/',
                         pattern = '[a-z]{3}_[0-9]+_h2.tsv', full.names = T)) {
   
   group_type <- str_extract(file,"fst|wpc")
