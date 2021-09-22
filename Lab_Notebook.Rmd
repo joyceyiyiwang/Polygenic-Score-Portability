@@ -3,7 +3,7 @@ title: "Lab Notebook"
 author: "Joyce Wang"
 date: "9/8/2021"
 output:
-  html_document:
+  pdf_document:
     toc: true
     toc_depth: 3
 ---
