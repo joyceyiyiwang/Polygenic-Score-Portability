@@ -44,7 +44,7 @@ This file creates some subdirectories under the same directory where this file i
   - `theoretical`
 - `img`
 
-For me, these directories are under `$WORK2/pgs_portability`
+For me, these directories are under `$WORK2/pgs_portability`.
 
 ## `01_UKBB_genotypes_filtered.sh`
 
