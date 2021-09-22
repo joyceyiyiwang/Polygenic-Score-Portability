@@ -18,7 +18,7 @@ if __name__ == "__main__":
         ('C', 'G'),
         ('G', 'C'),
     }
-
+    
     unfiltered = open(args.path, 'r')
     unfiltered_reader = csv.reader(unfiltered, delimiter='\t',
                                    skipinitialspace=True, quotechar='|')

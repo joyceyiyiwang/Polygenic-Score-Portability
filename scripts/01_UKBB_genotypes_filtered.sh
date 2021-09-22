@@ -13,10 +13,12 @@
 
 set -e
 
-plink="/work2/06568/joyce_w/stampede2/software/plink/plink"
-plink2="/work2/06568/joyce_w/stampede2/software/plink/plink2"
+plink="/work2/06568/joyce_w/stampede2/software/plink/plink/plink"
+plink2="/work2/06568/joyce_w/stampede2/software/plink/plink2/plink2"
 
-wb='/corral-repl/utexas/Recombining-sex-chro/ukb/data/genotype_calls'
+# The files must be copied to my directory in order for this script to work
+wb='/work2/06568/joyce_w/stampede2/pgs_portability/data/genotype_calls'
+#wb='/corral-repl/utexas/Recombining-sex-chro/ukb/data/genotype_calls'
 #nonwb='/rigel/mfplab/projects/ukb_hakhamanesh/imputed/plink_neale_nonWB'
 
 #module load anaconda3
@@ -30,16 +32,15 @@ for i in $(seq 22 22);
 do
   # Identify indels and ambiguous variants and write them to a file
   python 01a_get_ambiguous_indel_snps.py \
-    # Having an erro running the following line: 
-    # FileNotFoundError: [Errno 2] No such file or directory: 
-    # '/corral-repl/utexas/Recombining-sex-chro/ukb/data/genotype_calls/ukb_snp_chr22_v2.bim'
     ${wb}/ukb_snp_chr${i}_v2.bim \
     -o data/ambiguous_indel_snps/chr${i}.snps
 
   # Convert from Plink 1 to Plink 2 and compute the SNPs to be dropped
   $plink2 \
     --bfile ${wb}/ukb_snp_chr${i}_v2  \
-    --keep ${wb}/ukb22418_chr${i}_b0_v2_s488244.fam \
+    --bed ${wb}/ukb22418_c${i}_b0_v2.bed \
+    --fam ${wb}/ukb22418_c${i}_b0_v2_s488244.fam \
+    --keep ${wb}/ukb22418_c${i}_b0_v2_s488244.fam \
     --remove /work2/06568/joyce_w/stampede2/pgs_portability/data/ukb_meta/excluded_samples.sam \
     --exclude data/ambiguous_indel_snps/chr${i}.snps \
     --maf 0.01 \

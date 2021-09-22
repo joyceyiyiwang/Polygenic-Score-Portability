@@ -50,10 +50,9 @@ For me, these directories are under `$WORK2/pgs_portability`
 
 This file filters out the indels and ambiguous variants.
 
-**Currently having an error here trying to load the .bim files:**
+I had to copy the files from `/corral-repl/utexas/Recombining-sex-chro/ukb/data/genotype_calls/` into my directory for this script to work, or it will throw a `FileNotFoundError`.
 
-`FileNotFoundError: [Errno 2] No such file or directory:`
-`'/corral-repl/utexas/Recombining-sex-chro/ukb/data/genotype_calls/ukb_snp_chr22_v2.bim'`
+I'm working on getting the .sam file from BioBank.
 
 ### `01a_get_ambiguous_indel_snps.py`
 
