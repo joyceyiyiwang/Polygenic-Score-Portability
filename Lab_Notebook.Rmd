@@ -3,7 +3,7 @@ title: "Lab Notebook"
 author: "Joyce Wang"
 date: "9/8/2021"
 output:
-  pdf_document:
+  html_document:
     toc: true
     toc_depth: 3
 ---
@@ -52,8 +52,8 @@ This file filters out the indels and ambiguous variants.
 
 **Currently having an error here trying to load the .bim files:**
 
-`FileNotFoundError: [Errno 2] No such file or directory: '/corral-repl/utexas/Recombining-sex-chro/`
-`ukb/data/genotype_calls/ukb_snp_chr22_v2.bim'`
+`FileNotFoundError: [Errno 2] No such file or directory:`
+`'/corral-repl/utexas/Recombining-sex-chro/ukb/data/genotype_calls/ukb_snp_chr22_v2.bim'`
 
 ### `01a_get_ambiguous_indel_snps.py`
 
