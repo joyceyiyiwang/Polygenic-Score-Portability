@@ -1,0 +1,64 @@
+---
+title: "Lab Notebook"
+author: "Joyce Wang"
+date: "9/8/2021"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# `scripts` Folder
+
+## `00_make_directories.sh`
+
+This file creates some subdirectories under the same directory where this file is located, in the following structure:
+
+- `data`
+  - `ambiguous_indel_snps`
+  - `intersecting_filtered`
+  - `kgp_filtered`
+  - `kgp_merged`
+  - `kgp_meta`
+  - `ukb_filtered`
+  - `ukb_merged`
+  - `ukb_meta`
+  - `ukb_populations`
+  - `models`
+  - `phenotypes`
+  - `gwas_results`
+  - `prs`
+  - `kgp_populations`
+  - `fst`
+  - `LDpred`
+    - `prs`
+    - `tmp-data`
+    - `val_prs`
+  - `prs_comparisons`
+  - `theory`
+  - `theor_herit`
+  - `theoretical`
+- `img`
+
+For me, these directories are under `$WORK2/pgs_portability`
+
+## `01_UKBB_genotypes_filtered.sh`
+
+This file filters out the indels and ambiguous variants.
+
+**Currently having an error here trying to load the .bim files:**
+
+`FileNotFoundError: [Errno 2] No such file or directory: '/corral-repl/utexas/Recombining-sex-chro/`
+`ukb/data/genotype_calls/ukb_snp_chr22_v2.bim'`
+
+### `01a_get_ambiguous_indel_snps.py`
+
+### `01b_remove_ambiguous_indel_snps.py`
+
+### `01c_find_duplicates.py`
+
+### `01d_import_1KG.sh`
