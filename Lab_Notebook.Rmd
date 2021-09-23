@@ -44,15 +44,17 @@ This file creates some subdirectories under the same directory where this file i
   - `theoretical`
 - `img`
 
-For me, these directories are under `$WORK2/pgs_portability`.
+For me, these directories are under `$WORK2/pgs_portability/`.
 
 ## `01_UKBB_genotypes_filtered.sh`
 
 This file filters out the indels and ambiguous variants.
 
-I had to copy the files from `/corral-repl/utexas/Recombining-sex-chro/ukb/data/genotype_calls/` into my directory for this script to work, or it will throw a `FileNotFoundError`.
+I copied all the files from `/corral-repl/utexas/Recombining-sex-chro/ukb/data/genotype_calls/` into my directory `data/genotype_calls/` for this script to work, or it will throw a `FileNotFoundError`.
 
-I'm working on getting the .sam file from BioBank.
+The list of individuals to be excluded from the study is contained in `w61666_20210809.csv` under `data/ukb_meta/`.
+
+To get the IDs of WB, I ran `ukbconv ukb45020.enc_ukb txt -s34 -oYOB` and extracted the IDs. the extracted IDs were stored in the file `wb_id.txt` under `data/ukb_meta/`.
 
 ### `01a_get_ambiguous_indel_snps.py`
 
