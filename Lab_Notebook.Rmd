@@ -54,7 +54,9 @@ I copied all the files from `/corral-repl/utexas/Recombining-sex-chro/ukb/data/g
 
 The list of individuals to be excluded from the study is contained in `w61666_20210809.csv` under `data/ukb_meta/`.
 
-To get the IDs of WB, I ran `ukbconv ukb45020.enc_ukb txt -s34 -oYOB` and extracted the IDs. the extracted IDs were stored in the file `wb_id.txt` under `data/ukb_meta/`.
+To get the IDs of WB, I ran `ukbconv ukb45020.enc_ukb txt -s34 -oYOB` and extracted the IDs. the extracted IDs were stored in the file `wb_id.txt` under `data/ukb_meta/`. A list of non-WB individuals were stored in `nwb_id.txt`.
+
+After running this file, the outputs are stored at `data/ukb_filtered/` and `data/ukb_merged/`.
 
 ### `01a_get_ambiguous_indel_snps.py`
 

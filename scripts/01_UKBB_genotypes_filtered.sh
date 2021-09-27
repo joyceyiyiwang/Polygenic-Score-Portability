@@ -3,9 +3,9 @@
 #SBATCH -o make_filtered_genotypes_files.o%j
 #SBATCH -e make_filtered_genotypes_files.o%j
 #SBATCH -p normal
-#SBATCH -N 1 #5
-#SBATCH -n 4 #16
-#SBATCH -t 1:00:00 #24:00:00
+#SBATCH -N 5
+#SBATCH -n 16
+#SBATCH -t 24:00:00
 #SBATCH -A Harpak-Lab-GWAS
 #SBATCH --mail-user=joyce.wang@utexas.edu
 #SBATCH --mail-type=begin
@@ -17,9 +17,8 @@ plink="/work2/06568/joyce_w/stampede2/software/plink/plink/plink"
 plink2="/work2/06568/joyce_w/stampede2/software/plink/plink2/plink2"
 
 # The files must be copied to my directory in order for this script to work
-wb='/work2/06568/joyce_w/stampede2/pgs_portability/data/genotype_calls'
-#wb='/corral-repl/utexas/Recombining-sex-chro/ukb/data/genotype_calls'
-#nonwb='/rigel/mfplab/projects/ukb_hakhamanesh/imputed/plink_neale_nonWB'
+gt='/work2/06568/joyce_w/stampede2/pgs_portability/data/genotype_calls'
+meta='/work2/06568/joyce_w/stampede2/pgs_portability/data/ukb_meta'
 
 #module load anaconda3
 #source activate prs1
@@ -27,21 +26,20 @@ source /work2/06568/joyce_w/stampede2/software/anaconda3/etc/profile.d/conda.sh
 conda init bash
 conda activate prs1
 
-#for i in $(seq 1 23);
-for i in $(seq 22 22);
+for i in $(seq 1 22) 'MT' 'X' 'XY' 'Y';
 do
   # Identify indels and ambiguous variants and write them to a file
   python 01a_get_ambiguous_indel_snps.py \
-    ${wb}/ukb_snp_chr${i}_v2.bim \
+    ${gt}/ukb_snp_chr${i}_v2.bim \
     -o data/ambiguous_indel_snps/chr${i}.snps
 
   # Convert from Plink 1 to Plink 2 and compute the SNPs to be dropped
   $plink2 \
-    --bfile ${wb}/ukb_snp_chr${i}_v2  \
-    --bed ${wb}/ukb22418_c${i}_b0_v2.bed \
-    --fam ${wb}/ukb22418_c${i}_b0_v2_s488244.fam \
-    --keep ${wb}/ukb22418_c${i}_b0_v2_s488244.fam \
-    --remove /work2/06568/joyce_w/stampede2/pgs_portability/data/ukb_meta/excluded_samples.sam \
+    --bfile ${gt}/ukb_snp_chr${i}_v2  \
+    --bed ${gt}/ukb22418_c${i}_b0_v2.bed \
+    --fam ${gt}/ukb22418_c${i}_b0_v2_s488244.fam \
+    --keep-fam ${meta}/wb_id.txt \
+    --remove ${meta}/w61666_20210809.csv \
     --exclude data/ambiguous_indel_snps/chr${i}.snps \
     --maf 0.01 \
     --geno 0.01 \
@@ -60,18 +58,20 @@ do
   rm data/ukb_filtered/wb_chr${i}.pvar
   rm data/ukb_filtered/wb_chr${i}.psam 
 
-#  $plink2 \
-#    --bfile ${nonwb}/chr${i} \
-#    --keep ${nonwb}/ukb_filter_indivs_nowhiteB_unrelated.txt \
-#    --remove /rigel/mfplab/projects/prs-portability/data/ukb_meta/excluded_samples.sam \
-#    --extract data/ukb_filtered/wb_chr${i}.prune.in \
-#    --make-bed \
-#    --out data/ukb_filtered/nonwb_chr${i}
+  $plink2 \
+    --bfile ${gt}/ukb_snp_chr${i}_v2  \
+    --bed ${gt}/ukb22418_c${i}_b0_v2.bed \
+    --fam ${gt}/ukb22418_c${i}_b0_v2_s488244.fam \
+    --keep-fam ${meta}/nwb_id.txt \
+    --remove ${meta}/w61666_20210809.csv \
+    --extract data/ukb_filtered/wb_chr${i}.prune.in \
+    --make-bed \
+    --out data/ukb_filtered/nonwb_chr${i}
 
 
   # Append the output file path to a new file (for merging them all below)
   printf "data/ukb_filtered/wb_chr%s\n" $i >> data/ukb_merged/ukb_merged_list${i}.txt
-#  printf "data/ukb_filtered/nonwb_chr%s\n" $i >> data/ukb_merged/ukb_merged_list${i}.txt
+  printf "data/ukb_filtered/nonwb_chr%s\n" $i >> data/ukb_merged/ukb_merged_list${i}.txt
 
   $plink \
     --merge-list data/ukb_merged/ukb_merged_list${i}.txt \
@@ -79,7 +79,7 @@ do
     --out data/ukb_merged/chr${i}
 
   rm data/ukb_filtered/wb_chr${i}.b*
-#  rm data/ukb_filtered/nonwb_chr${i}.b*
+  rm data/ukb_filtered/nonwb_chr${i}.b*
   rm data/ukb_filtered/*.fam
   rm data/ukb_filtered/*.log
 
