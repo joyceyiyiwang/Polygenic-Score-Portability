@@ -60,8 +60,16 @@ After running this file, the outputs are stored at `data/ukb_filtered/` and `dat
 
 ### `01a_get_ambiguous_indel_snps.py`
 
+This is a helper script for `01_UKBB_genotypes_filtered.sh` that identifies ambigupus indel SNPs.
+
 ### `01b_remove_ambiguous_indel_snps.py`
+
+I haven't used this script yet.
 
 ### `01c_find_duplicates.py`
 
+I haven't used this script yet.
+
 ### `01d_import_1KG.sh`
+
+I got the `.vcf` and `.ped` file by running the commented commands in this script, but I don't know how to get the `pfile`.
