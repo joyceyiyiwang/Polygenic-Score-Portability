@@ -2,6 +2,7 @@
 title: "Lab Notebook"
 author: "Joyce Wang"
 date: "9/8/2021"
+urlcolor: blue
 output:
   pdf_document:
     toc: true
@@ -72,4 +73,14 @@ I haven't used this script yet.
 
 ### `01d_import_1KG.sh`
 
-I got the `.vcf` and `.ped` file by running the commented commands in this script, but I don't know how to get the `pfile`.
+I downloaded the 1000 Genome VCF dataset for each chromosome from [https://ftp-trace.ncbi.nih.gov/1000genomes/ftp/release/20130502/](https://ftp-trace.ncbi.nih.gov/1000genomes/ftp/release/20130502/)
+
+## `02_PCA_plink.sh`
+
+I'm skipping this file for now because I don't need to project the UKB individuals onto the 1000 Genome dataset.
+
+## `03_predict_populations.sh`
+
+I'm skipping this file for now because I don't need to project the UKB individuals onto the 1000 Genome dataset.
+
+For PC, use field 22020

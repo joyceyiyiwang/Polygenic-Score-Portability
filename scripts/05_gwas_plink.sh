@@ -1,16 +1,21 @@
 #!/bin/bash
-#
-#SBATCH --account=mfplab
-#SBATCH --job-name=GWAS
-#SBATCH -c 10
-#SBATCH --time=2-00:00:00
-#SBATCH --mem-per-cpu=8gb
+#SBATCH -J GWAS
+#SBATCH -o GWAS.o%j
+#SBATCH -e GWAS.o%j
+#SBATCH -p normal
+#SBATCH -N 10
+#SBATCH -n 8
+#SBATCH -t 48:00:00
+#SBATCH -A Harpak-Lab-GWAS
+#SBATCH --mail-user=joyce.wang@utexas.edu
+#SBATCH --mail-type=begin
+#SBATCH --mail-type=end
 
 set -e
 
 #Central directory version of plink not up to-date
-plink='/rigel/mfplab/users/jm4454/plink/plink'
-plink2='/rigel/mfplab/users/jm4454/plink/plink2'
+plink='/work2/06568/joyce_w/stampede2/software/plink/plink/plink'
+plink2='/work2/06568/joyce_w/stampede2/software/plink/plink2/plink2'
 
 for phenotype in BMI Lymphocyte Height Eosinophil MCH MCV Monocyte Platelet RBC WBC
 do
@@ -20,18 +25,14 @@ do
   for chromosome in $(seq 1 22);
   do
     $plink2\
-      --bfile data/ukb_filtered/chr${chromosome}
-#      --bgen /rigel/mfplab/projects/ukb_hakhamanesh/imputed/bgen_files/_001_ukb_imp_chr${chromosome}_v2.bgen ref-first \
-#      --sample /rigel/mfplab/projects/ukb_hakhamanesh/imputed/bgen_files/ukb_imp.sample \
-#      --extract /rigel/mfplab/projects/prs-portability/data/bbj/snps.txt \
-#      --keep data/ukb_populations/${phenotype}.txt
-      --keep data/ukb_populations/${phenotype}1.txt \
+      --bfile data/ukb_merged/chr${chromosome} \
+      --keep data/ukb_populations/${phenotype}.txt \
       --pheno data/phenotypes/full_phenotypes.pheno \
       --pheno-name $phenotype \
       --require-pheno $phenotype \
       --covar data/ukb_merged/covar_all_samples.covar \
-      --covar-name age sex_covar age_sq age_sex age_sq_sex $(printf "PC%i_AVG " $(seq 1 20)) \
-      --require-covar age sex_covar age_sq age_sex age_sq_sex $(printf "PC%i_AVG " $(seq 1 20)) \
+      --covar-name age sex_covar age_sq age_sex age_sq_sex $(printf "PC%i " $(seq 1 20)) \
+      --require-covar age sex_covar age_sq age_sex age_sq_sex $(printf "PC%i " $(seq 1 20)) \
       --vif 100000 \
       --memory 35000 \
       --glm hide-covar \

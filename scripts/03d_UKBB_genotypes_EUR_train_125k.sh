@@ -1,36 +1,41 @@
 #!/bin/bash
-#
-#SBATCH --account=mfplab
-#SBATCH --job-name=EUR_train_geno
-#SBATCH -c 3
-#SBATCH --time=05:00:00
-#SBATCH --mem-per-cpu=8gb
+#SBATCH -J EUR_train_geno
+#SBATCH -o EUR_train_geno.o%j
+#SBATCH -e EUR_train_geno.o%j
+#SBATCH -p normal
+#SBATCH -N 3
+#SBATCH -n 8
+#SBATCH -t 5:00:00
+#SBATCH -A Harpak-Lab-GWAS
+#SBATCH --mail-user=joyce.wang@utexas.edu
+#SBATCH --mail-type=begin
+#SBATCH --mail-type=end
 
 
 set -e
 
-plink='/rigel/mfplab/users/jm4454/plink/plink'
-plink2='/rigel/mfplab/users/jm4454/plink/plink2'
+plink='/work2/06568/joyce_w/stampede2/software/plink/plink/plink'
+plink2='/work2/06568/joyce_w/stampede2/software/plink/plink2/plink2'
 
 
 for chromosome in $(seq 1 22);
 do
    $plink2 \
       --bfile data/ukb_merged/chr${chromosome} \
-      --keep data/ukb_populations/LD_EUR_train1.txt \
+      --keep data/ukb_populations/LD_CEU_train.txt \
       --make-bed \
-      --out data/LDpred1/LD_EUR_train_${chromosome}
+      --out data/LDpred/LD_CEU_train_${chromosome}
 
-   printf "data/LDpred1/LD_EUR_train_%s\n" $chromosome >> data/LDpred1/LD_EUR_train_merged_list.txt
+   printf "data/LDpred/LD_CEU_train_%s\n" $chromosome >> data/LDpred/LD_CEU_train_merged_list.txt
 done
 
 $plink \
-  --merge-list data/LDpred1/LD_EUR_train_merged_list.txt \
+  --merge-list data/LDpred/LD_CEU_train_merged_list.txt \
   --make-bed  \
-  --out data/LDpred1/LD_EUR_merged
+  --out data/LDpred/LD_CEU_merged
 
 #$plink \
 #  --bfile data/ukb_merged/merged \
-#  --keep data/ukb_populations/EUR_all.txt \
+#  --keep data/ukb_populations/CEU_all.txt \
 #  --make-bed \
-#  --out data/ukb_merged/EUR_all
+#  --out data/ukb_merged/CEU_all

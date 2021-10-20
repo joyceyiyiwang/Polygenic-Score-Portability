@@ -18,13 +18,13 @@ def load_1000_genomes(pc_cols):
     )
     # 1000 Genomes individual population labels
     kgp_pop_df = pd.read_csv(
-        '/rigel/mfplab/projects/prs-portability/data/kgp_meta/integrated_call_samples_v2.20130502.ALL.ped',
+        'data/kgp_meta/integrated_call_samples.20130502.ALL.ped',
         sep='\t',
         usecols=['Family ID', 'Individual ID', 'Gender', 'Population']
     )
     # 1000 Genomes map between population and super population
     kgp_super_pop_df = pd.read_csv(
-        '/rigel/mfplab/projects/prs-portability/data/kgp_meta/20131219.populations.tsv',
+        'data/kgp_meta/20131219.populations.tsv',
         sep='\t',
         usecols=['Population Code', 'Super Population']
     )
@@ -44,7 +44,7 @@ def load_1000_genomes(pc_cols):
 def train_classifier(df, pc_cols, n_estimators=100, seed=100):
     # Separate data into X and y, as typical in the sklearn API
     principal_components = df.loc[:, pc_cols].values
-    labels = df.loc[:, 'Super_Population'].values
+    labels = df.loc[:, 'Population'].values
 
     rf = sklearn.ensemble.RandomForestClassifier(n_estimators=n_estimators,
                                                  random_state=seed)
@@ -92,12 +92,24 @@ if __name__ == '__main__':
 
     #Create population files for 1KG data
     kgp_df = kgp_df.rename(columns={'Family ID':'#FID'}) 
-    kgp_df = kgp_df.rename(columns={'Super Population':'Super_Population'})
+    #kgp_df = kgp_df.rename(columns={'Super Population':'Super_Population'})
+    kgp_df = kgp_df.rename(columns={'Population':'Population'})
 
-    for population in ['AFR', 'AMR', 'EAS', 'EUR', 'SAS']:
+    #for population in ['AFR', 'AMR', 'EAS', 'EUR', 'SAS']:
+    #    (
+    #        kgp_df
+    #        .query(f'Super_Population == "{population}"')
+    #        .loc[:, ['#FID', 'IID']]
+    #        .to_csv(f'data/kgp_populations/{population}_all.txt', header=True,
+    #                index=False, sep=' ')
+    #    )
+    for population in ['CHB', 'JPT', 'CHS', 'CDX', 'KHV', 'CHD', 'CEU', 'TSI',
+     'GBR', 'FIN', 'IBS', 'YRI', 'LWK', 'GWD', 'MSL', 'ESN', 'ASW', 'ACB', 
+     'MXL', 'PUR', 'CLM', 'PEL', 'GIH', 'PJL', 'BEB', 'STU', 'ITU']:
         (
             kgp_df
-            .query(f'Super_Population == "{population}"')
+            #.query(f'Super_Population == "{population}"')
+            .query(f'Population == "{population}"')
             .loc[:, ['#FID', 'IID']]
             .to_csv(f'data/kgp_populations/{population}_all.txt', header=True,
                     index=False, sep=' ')
@@ -110,5 +122,5 @@ if __name__ == '__main__':
         pickle.dump(classifier, f)
 
     ukb_labels_df = classify_ukbb(classifier, use_pcs)
-    ukb_labels_df.to_csv('data/ukb_merged/population_labels_10PCS.tsv.gz',
+    ukb_labels_df.to_csv('data/ukb_merged/sub_population_labels_10PCS.tsv.gz',
                          sep='\t', compression='infer', index=False)

@@ -3,10 +3,10 @@ library(cowplot)
 library(colorspace)
 
 # Plot 1000 Genomes PCAs
-labels_df <- read_tsv('/rigel/mfplab/projects/prs-portability/data/kgp_meta/integrated_call_samples_v2.20130502.ALL.ped',
+labels_df <- read_tsv('data/kgp_meta/integrated_call_samples.20130502.ALL.ped',
                       col_types = cols_only('Individual ID' = col_character(),
                                             'Population' = col_character()))
-super_pop_df <- read_tsv('/rigel/mfplab/projects/prs-portability/data/kgp_meta/20131219.populations.tsv')
+super_pop_df <- read_tsv('data/kgp_meta/20131219.populations.tsv')
 labels_df <- labels_df %>%
     inner_join(super_pop_df, by = c('Population' = 'Population Code'))
 

@@ -1,17 +1,22 @@
 #!/bin/bash
-#
-#SBATCH --account=mfplab
-#SBATCH --job-name=PCA
-#SBATCH -c 3
-#SBATCH --time=5:00:00
-#SBATCH --mem-per-cpu=8gb
+#SBATCH -J PCA
+#SBATCH -o PCA.o%j
+#SBATCH -e PCA.o%j
+#SBATCH -p normal
+#SBATCH -N 3
+#SBATCH -n 8
+#SBATCH -t 5:00:00
+#SBATCH -A Harpak-Lab-GWAS
+#SBATCH --mail-user=joyce.wang@utexas.edu
+#SBATCH --mail-type=begin
+#SBATCH --mail-type=end
 
 # Fail if any command fails
 set -e
 
 #Central directory of plink software is not up to-date
-plink='/rigel/mfplab/users/jm4454/plink/plink'
-plink2='/rigel/mfplab/users/jm4454//plink/plink2'
+plink='/work2/06568/joyce_w/stampede2/software/plink/plink/plink'
+plink2='/work2/06568/joyce_w/stampede2/software/plink/plink2/plink2'
 
 # Compute PCA on the 1000 Genomes project filtered and merged genotypes
 $plink2 \

@@ -26,7 +26,7 @@ source /work2/06568/joyce_w/stampede2/software/anaconda3/etc/profile.d/conda.sh
 conda init bash
 conda activate prs1
 
-for i in $(seq 1 22) 'MT' 'X' 'XY' 'Y';
+for i in $(seq 1 22);
 do
   # Identify indels and ambiguous variants and write them to a file
   python 01a_get_ambiguous_indel_snps.py \
@@ -34,56 +34,30 @@ do
     -o data/ambiguous_indel_snps/chr${i}.snps
 
   # Convert from Plink 1 to Plink 2 and compute the SNPs to be dropped
+  # Keep the unrelated individuals
+  # Remove participants who opted out from the study
   $plink2 \
     --bfile ${gt}/ukb_snp_chr${i}_v2  \
     --bed ${gt}/ukb22418_c${i}_b0_v2.bed \
     --fam ${gt}/ukb22418_c${i}_b0_v2_s488244.fam \
-    --keep-fam ${meta}/wb_id.txt \
+    --keep data/extracted_phenotypes/unrelated.id.txt \
     --remove ${meta}/w61666_20210809.csv \
     --exclude data/ambiguous_indel_snps/chr${i}.snps \
     --maf 0.01 \
     --geno 0.01 \
     --indep-pairwise 1000 kb 1 0.2 \
     --make-pgen \
-    --out data/ukb_filtered/wb_chr${i}
+    --out data/ukb_merged/chr${i}
 
   # Write a new file using only filtered SNPs for 1000 Genomes (Plink 1 format)
   $plink2 \
-    --pfile data/ukb_filtered/wb_chr${i} \
-    --extract data/ukb_filtered/wb_chr${i}.prune.in \
-    --make-bed \
-    --out data/ukb_filtered/wb_chr${i}
-
-  rm data/ukb_filtered/wb_chr${i}.pgen
-  rm data/ukb_filtered/wb_chr${i}.pvar
-  rm data/ukb_filtered/wb_chr${i}.psam 
-
-  $plink2 \
-    --bfile ${gt}/ukb_snp_chr${i}_v2  \
-    --bed ${gt}/ukb22418_c${i}_b0_v2.bed \
-    --fam ${gt}/ukb22418_c${i}_b0_v2_s488244.fam \
-    --keep-fam ${meta}/nwb_id.txt \
-    --remove ${meta}/w61666_20210809.csv \
-    --extract data/ukb_filtered/wb_chr${i}.prune.in \
-    --make-bed \
-    --out data/ukb_filtered/nonwb_chr${i}
-
-
-  # Append the output file path to a new file (for merging them all below)
-  printf "data/ukb_filtered/wb_chr%s\n" $i >> data/ukb_merged/ukb_merged_list${i}.txt
-  printf "data/ukb_filtered/nonwb_chr%s\n" $i >> data/ukb_merged/ukb_merged_list${i}.txt
-
-  $plink \
-    --merge-list data/ukb_merged/ukb_merged_list${i}.txt \
+    --pfile data/ukb_merged/chr${i} \
+    --extract data/ukb_merged/chr${i}.prune.in \
     --make-bed \
     --out data/ukb_merged/chr${i}
 
-  rm data/ukb_filtered/wb_chr${i}.b*
-  rm data/ukb_filtered/nonwb_chr${i}.b*
-  rm data/ukb_filtered/*.fam
-  rm data/ukb_filtered/*.log
-
-  printf "data/ukb_merged/chr$%s\n" $i >> data/ukb_merged/ukb_merged_list.txt
+  # Append the output file path to a new file (for merging them all below)
+  printf "data/ukb_merged/chr%s\n" $i >> data/ukb_merged/ukb_merged_list${i}.txt
 done
 
 
