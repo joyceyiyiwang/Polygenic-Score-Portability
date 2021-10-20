@@ -40,7 +40,7 @@ do
     --bfile ${gt}/ukb_snp_chr${i}_v2  \
     --bed ${gt}/ukb22418_c${i}_b0_v2.bed \
     --fam ${gt}/ukb22418_c${i}_b0_v2_s488244.fam \
-    --keep data/extracted_phenotypes/unrelated.id.txt \
+    --keep data/extracted_phenotypes/ukb.unrelated.id.txt \
     --remove ${meta}/w61666_20210809.csv \
     --exclude data/ambiguous_indel_snps/chr${i}.snps \
     --maf 0.01 \
