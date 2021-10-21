@@ -8,12 +8,10 @@ import pandas as pd
 
 def make_population_sample_files(all_populations_df):
     """Make files with IIDs for each of the populations used for GWAS"""
-    for population in ['CHB', 'JPT', 'CHS', 'CDX', 'KHV', 'CHD', 'CEU', 'TSI',
-     'GBR', 'FIN', 'IBS', 'YRI', 'LWK', 'GWD', 'MSL', 'ESN', 'ASW', 'ACB', 
-     'MXL', 'PUR', 'CLM', 'PEL', 'GIH', 'PJL', 'BEB', 'STU', 'ITU']:
+    for population in ['WB', 'NWB']:
         (
             all_populations_df
-            .query(f'predicted == "{population}"')
+            .query(f'WB == "{population}"')
             .loc[:, ['#FID', 'IID']]
             .to_csv(f'data/ukb_populations/{population}_all.txt', header=True,
                     index=False, sep=' ')
@@ -56,22 +54,20 @@ if __name__ == '__main__':
 
     # DataFrame of predicted super population labels for UKBB samples
     labels_df = (
-        pd.read_csv('data/ukb_merged/sub_population_labels_10PCS.tsv.gz', sep='\t')
-        # .query('inconclusive == False')
-        .drop_duplicates(subset=['#FID', 'IID'])
-    )
+        pd.read_csv('data/ukb_merged/population_labels.tsv.gz', sep='\t'))
+
 
     # 5000 random samples used as the "Target" set for EUR
     eur_test_df = (
         labels_df
-        .query('predicted == "CEU"')
+        .query('WB == "WB"')
         .sample(n=5000, replace=False, random_state=seed)
     )
 
     (
         eur_test_df
         .loc[:, ['#FID', 'IID']]
-        .to_csv('data/ukb_populations/CEU_test.txt', index=False, header=True,
+        .to_csv('data/ukb_populations/WB_test.txt', index=False, header=True,
                 sep=' ')
     )
 
@@ -84,7 +80,7 @@ if __name__ == '__main__':
     # Use only EUR population for GWAS
     eur_train_df = (
         non_test_df
-        .query('predicted == "CEU"')
+        .query('WB == "WB"')
         .loc[:, ['#FID', 'IID']]
     )
     del labels_df, non_test_df
@@ -97,6 +93,5 @@ if __name__ == '__main__':
 
     # From training set, create a sample file to represent training group's LD patterns
     ld_samples = eur_train_df.sample(n=125000, random_state=seed)
-    #ld_samples = eur_train_df.sample(n=int(eur_train_df.shape[0]*0.625), random_state=seed)
-    ld_samples.to_csv(f'data/ukb_populations/LD_CEU_train.txt', header=True,index=False, sep=' ')
+    ld_samples.to_csv(f'data/ukb_populations/LD_WB_train.txt', header=True,index=False, sep=' ')
 

@@ -47,17 +47,33 @@ do
     --geno 0.01 \
     --indep-pairwise 1000 kb 1 0.2 \
     --make-pgen \
-    --out data/ukb_merged/chr${i}
+    --out data/ukb_filtered/chr${i}
 
   # Write a new file using only filtered SNPs for 1000 Genomes (Plink 1 format)
   $plink2 \
-    --pfile data/ukb_merged/chr${i} \
-    --extract data/ukb_merged/chr${i}.prune.in \
+    --pfile data/ukb_filtered/chr${i} \
+    --extract data/ukb_filtered/chr${i}.prune.in \
+    --make-bed \
+    --out data/ukb_filtered/chr${i}
+
+  rm data/ukb_filtered/chr${i}.pgen
+  rm data/ukb_filtered/chr${i}.pvar
+  rm data/ukb_filtered/chr${i}.psam 
+
+  # Append the output file path to a new file (for merging them all below)
+  printf "data/ukb_filtered/chr%s\n" $i >> data/ukb_merged/ukb_merged_list${i}.txt
+
+  $plink \
+    --merge-list data/ukb_merged/ukb_merged_list${i}.txt \
     --make-bed \
     --out data/ukb_merged/chr${i}
 
+  rm data/ukb_filtered/chr${i}.b*
+  rm data/ukb_filtered/*.fam
+  rm data/ukb_filtered/*.log
+
   # Append the output file path to a new file (for merging them all below)
-  printf "data/ukb_merged/chr%s\n" $i >> data/ukb_merged/ukb_merged_list${i}.txt
+  printf "data/ukb_merged/chr$%s\n" $i >> data/ukb_merged/ukb_merged_list.txt
 done
 
 

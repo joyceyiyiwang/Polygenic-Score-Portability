@@ -22,20 +22,20 @@ for chromosome in $(seq 1 22);
 do
    $plink2 \
       --bfile data/ukb_merged/chr${chromosome} \
-      --keep data/ukb_populations/LD_CEU_train.txt \
+      --keep data/ukb_populations/LD_WB_train.txt \
       --make-bed \
-      --out data/LDpred/LD_CEU_train_${chromosome}
+      --out data/LDpred/LD_WB_train_${chromosome}
 
-   printf "data/LDpred/LD_CEU_train_%s\n" $chromosome >> data/LDpred/LD_CEU_train_merged_list.txt
+   printf "data/LDpred/LD_WB_train_%s\n" $chromosome >> data/LDpred/LD_WB_train_merged_list.txt
 done
 
 $plink \
-  --merge-list data/LDpred/LD_CEU_train_merged_list.txt \
+  --merge-list data/LDpred/LD_WB_train_merged_list.txt \
   --make-bed  \
-  --out data/LDpred/LD_CEU_merged
+  --out data/LDpred/LD_WB_merged
 
 #$plink \
 #  --bfile data/ukb_merged/merged \
-#  --keep data/ukb_populations/CEU_all.txt \
+#  --keep data/ukb_populations/WB_train.txt \
 #  --make-bed \
-#  --out data/ukb_merged/CEU_all
+#  --out data/ukb_merged/WB_train

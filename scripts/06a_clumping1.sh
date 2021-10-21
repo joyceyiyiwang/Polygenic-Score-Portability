@@ -34,7 +34,7 @@ do
     # Clump GWAS results using LD from 1000 Genomes EUR super-population 
     $plink \
     --memory 35000 \
-    --bfile data/LDpred/LD_CEU_train_${chromosome} \
+    --bfile data/LDpred/LD_WB_train_${chromosome} \
     --clump data/gwas_results/${phenotype}.chr${chromosome}.${phenotype}.glm.assoc \
     --clump-p1 0.01 \
     --clump-p2 1 \

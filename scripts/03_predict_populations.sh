@@ -27,7 +27,6 @@ python 03a_classify_ukb.py
 # Also does train/test splitting for the "target" individuals.
 python 03b_separate_populations.py
 
-# Rename erroneously named file data/ukb_populations/EUR_all = all training EUR
+# Rename WB_all.txt to WB_train.txt
+#mv data/ukb_populations/WB_all.txt data/ukb_populations/WB_train.txt
 
-# Create plots of PCAs of 1000 Genomes population classifier on 1KG and  UK Biobank
-#Rscript 03c_plot_pca.R

@@ -40,6 +40,13 @@ for (i in 1:length(phenotypes)){
 		 col = c("blue4", "orange3"), suggestiveline=T, genomewideline=T, cex=0.4)
 	dev.off()
 	
+	png(paste0("img/",phenotypes[i],"_linear_manhattan_zoomed.png"))
+	manhattan(results_as,chr="X.CHROM",bp="POS",p="P",snp="ID",
+	          main = paste0("Manhattan plot: ",phenotypes[i]),
+	          col = c("blue4", "orange3"), suggestiveline=T, genomewideline=T, cex=0.4,
+	          ylim = c(0, 20))
+	dev.off()
+	
 	#QQ Plot of P-values
         png(paste0("img/",phenotypes[i],"_linear_qqplot.png"))
 	qq(results_as$P, main = paste0("Q-Q plot of GWAS p-values for ",phenotypes[i]),
