@@ -76,6 +76,7 @@ do
   printf "data/ukb_merged/chr$%s\n" $i >> data/ukb_merged/ukb_merged_list.txt
 done
 
+# Correct the file names in data/ukb_merged/ukb_merged_list.txt before continuing
 
 #$plink \
 #  --merge-list data/ukb_merged/ukb_merged_list.txt \

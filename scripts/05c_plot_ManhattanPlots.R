@@ -37,13 +37,13 @@ for (i in 1:length(phenotypes)){
 	png(paste0("img/",phenotypes[i],"_linear_manhattan.png"))
 	manhattan(results_as,chr="X.CHROM",bp="POS",p="P",snp="ID",
 		 main = paste0("Manhattan plot: ",phenotypes[i]),
-		 col = c("blue4", "orange3"), suggestiveline=T, genomewideline=T, cex=0.4)
+		 col = c("blue4", "orange3"), cex=0.4)
 	dev.off()
 	
 	png(paste0("img/",phenotypes[i],"_linear_manhattan_zoomed.png"))
 	manhattan(results_as,chr="X.CHROM",bp="POS",p="P",snp="ID",
 	          main = paste0("Manhattan plot: ",phenotypes[i]),
-	          col = c("blue4", "orange3"), suggestiveline=T, genomewideline=T, cex=0.4,
+	          col = c("blue4", "orange3"), cex=0.4,
 	          ylim = c(0, 20))
 	dev.off()
 	

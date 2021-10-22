@@ -13,8 +13,9 @@
 
 set -e
 
-module load anaconda/3-4.2.0
-source activate prs1
+source /work2/06568/joyce_w/stampede2/software/anaconda3/etc/profile.d/conda.sh
+conda init bash
+conda activate prs1
 
 plink="/work2/06568/joyce_w/stampede2/software/plink/plink/plink"
 

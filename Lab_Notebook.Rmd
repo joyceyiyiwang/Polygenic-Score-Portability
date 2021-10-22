@@ -108,7 +108,7 @@ The respective UKB field codes are stored as `martin_gwas_info.txt` under `data/
 
 ## `05_gwas_plink.sh`
 
-This file runs GWAS on the randomly selected `200,000` WB individuals from the training set for each trait.
+This file runs GWAS on the randomly selected `200,000` WB individuals from the training set for each trait. For PCs, the first 20 are used.
 
 ### `05b_plot_Manhattan.sh`
 
