@@ -13,9 +13,6 @@
 
 set -e
 
-#module load anaconda/3-4.2.0
-#module load R
-#source activate prs
 source /work2/06568/joyce_w/stampede2/software/anaconda3/etc/profile.d/conda.sh
 conda init bash
 conda activate prs1

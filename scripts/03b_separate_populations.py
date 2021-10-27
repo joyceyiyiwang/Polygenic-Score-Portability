@@ -61,7 +61,7 @@ if __name__ == '__main__':
     eur_test_df = (
         labels_df
         .query('WB == "WB"')
-        .sample(n=5000, replace=False, random_state=seed)
+        .sample(n=70000, replace=False, random_state=seed)
     )
 
     (

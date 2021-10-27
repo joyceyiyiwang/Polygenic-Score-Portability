@@ -20,8 +20,6 @@ plink2="/work2/06568/joyce_w/stampede2/software/plink/plink2/plink2"
 gt='/work2/06568/joyce_w/stampede2/pgs_portability/data/genotype_calls'
 meta='/work2/06568/joyce_w/stampede2/pgs_portability/data/ukb_meta'
 
-#module load anaconda3
-#source activate prs1
 source /work2/06568/joyce_w/stampede2/software/anaconda3/etc/profile.d/conda.sh
 conda init bash
 conda activate prs1

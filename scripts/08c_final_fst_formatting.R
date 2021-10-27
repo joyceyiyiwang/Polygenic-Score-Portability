@@ -11,13 +11,17 @@ for (file in list.files(path = 'data/fst',
         fst_df <- rbind(fst_df,fst_df_append)
         rm(fst_df_append)
     
-}                      
-   
-fst_df <- fst_df %>%
-    pivot_wider(names_from=label,values_from=Fst)%>%
+}
+row_num = c()
+for(i in 1:round(nrow(fst_df) / 3)){
+  row_num = c(row_num, rep(i, 3))
+}
+
+fst_df <- fst_df %>% mutate(row_num = row_num) %>%
+    pivot_wider(names_from=label,values_from=Fst)%>% select(-row_num) %>%
     arrange(IID)
                        
-fst %>% write_tsv('data/fst/final_fst.tsv')
-fst %>% write_tsv('data/phenotypes/final_fst_no_filter.tsv')
+fst_df %>% write_tsv('data/fst/final_fst.tsv')
+fst_df %>% write_tsv('data/phenotypes/final_fst_no_filter.tsv')
 
 

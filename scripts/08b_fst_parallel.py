@@ -19,41 +19,78 @@ def submit_batch_fst_computation(group_label, test_fids, temp_dir):
     """
     formatted_fids = ' '.join([str(i) for i in test_fids])
     script_path = temp_dir.joinpath(f'run_{group_label}.sh')
-    script_string = (
-        "#!/bin/bash\n"
-        f"#SBATCH -J fst{group_label}\n"
-        f"#SBATCH -o fst{group_label}.o%j\n"
-        f"#SBATCH -e fst{group_label}.o%j\n"
-        "#SBATCH -p normal\n"
-        "#SBATCH -N 1\n"
-        "#SBATCH -n 8\n"
-        "#SBATCH -t=24:00:00\n"
-        "#SBATCH -A Harpak-Lab-GWAS\n"
-        "#SBATCH --mail-user=joyce.wang@utexas.edu\n"
-        "#SBATCH --mail-type=begin\n"
-        "#SBATCH --mail-type=end\n\n"
-        "plink='/work2/06568/joyce_w/stampede2/software/plink/plink/plink'\n"
-        f"group={group_label}\n"
-        f"for test_fid in {formatted_fids}\n"
-        "do\n"
-        "  $plink "
-        "  --bim data/ukb_merged/merged.bim "
-        "  --bed data/ukb_merged/merged.bed "
-        "  --fam data/ukb_merged/merged_fst.fam "
-        "  --family "
-        "  --fst "
-        "  --keep-cluster-names train ${test_fid} "
-        "  --out data/fst/fst${test_fid}\n\n"
-        "  rm data/fst/fst${test_fid}.fst data/fst/fst${test_fid}.nosex\n"
-        "  echo ${test_fid} >> data/fst/fst${group}.est\n"
-        "  grep 'Fst estimate:' data/fst/fst${test_fid}.log >> data/fst/fst${group}.est\n"
-        "  rm data/fst/fst${test_fid}.log\n"
-        "done\n"
-        # Delete the script itself
-        f"rm {script_path.as_posix()}")
-    with open(script_path, 'w') as f:
-        f.write(script_string)
-#    os.system(f'sbatch {script_path.as_posix()}')
+    if group_label % 50 == 0:
+        script_string = (
+            "#!/bin/bash\n"
+            f"#SBATCH -J fst{group_label}\n"
+            f"#SBATCH -o fst{group_label}.o%j\n"
+            f"#SBATCH -e fst{group_label}.o%j\n"
+            "#SBATCH -p normal\n"
+            "#SBATCH -N 1\n"
+            "#SBATCH -n 1\n"
+            "#SBATCH -t 5:00:00\n"
+            "#SBATCH -A Harpak-Lab-GWAS\n"
+            "#SBATCH --mail-user=joyce.wang@utexas.edu\n"
+            "#SBATCH --mail-type=begin\n"
+            "#SBATCH --mail-type=end\n\n"
+            "plink='/work2/06568/joyce_w/stampede2/software/plink/plink/plink'\n"
+            f"group={group_label}\n"
+            f"for test_fid in {formatted_fids}\n"
+            "do\n"
+            "  $plink "
+            "  --bim ../data/ukb_merged/merged.bim "
+            "  --bed ../data/ukb_merged/merged.bed "
+            "  --fam ../data/ukb_merged/merged_fst.fam "
+            "  --family "
+            "  --fst "
+            "  --keep-cluster-names train ${test_fid} "
+            "  --out ../data/fst/fst${test_fid}\n\n"
+            "  rm ../data/fst/fst${test_fid}.fst ../data/fst/fst${test_fid}.nosex\n"
+            "  echo ${test_fid} >> ../data/fst/fst${group}.est\n"
+            "  grep 'Fst estimate:' ../data/fst/fst${test_fid}.log >> ../data/fst/fst${group}.est\n"
+            "  rm ../data/fst/fst${test_fid}.log\n"
+            "done\n"
+            # Delete the script itself
+#            f"rm {script_path.as_posix()}")
+#        with open(script_path, 'w') as f:
+#            f.write(script_string)
+#        os.system(f'sbatch {script_path.as_posix()}'
+        )
+    else:
+        script_string = (
+            "#!/bin/bash\n"
+            f"#SBATCH -J fst{group_label}\n"
+            f"#SBATCH -o fst{group_label}.o%j\n"
+            f"#SBATCH -e fst{group_label}.o%j\n"
+            "#SBATCH -p normal\n"
+            "#SBATCH -N 1\n"
+            "#SBATCH -n 1\n"
+            "#SBATCH -t 5:00:00\n"
+            "#SBATCH -A Harpak-Lab-GWAS\n\n"
+            "plink='/work2/06568/joyce_w/stampede2/software/plink/plink/plink'\n"
+            f"group={group_label}\n"
+            f"for test_fid in {formatted_fids}\n"
+            "do\n"
+            "  $plink "
+            "  --bim ../data/ukb_merged/merged.bim "
+            "  --bed ../data/ukb_merged/merged.bed "
+            "  --fam ../data/ukb_merged/merged_fst.fam "
+            "  --family "
+            "  --fst "
+            "  --keep-cluster-names train ${test_fid} "
+            "  --out ../data/fst/fst${test_fid}\n\n"
+            "  rm ../data/fst/fst${test_fid}.fst ../data/fst/fst${test_fid}.nosex\n"
+            "  echo ${test_fid} >> ../data/fst/fst${group}.est\n"
+            "  grep 'Fst estimate:' ../data/fst/fst${test_fid}.log >> ../data/fst/fst${group}.est\n"
+            "  rm ../data/fst/fst${test_fid}.log\n"
+            "done\n"
+            # Delete the script itself
+#            f"rm {script_path.as_posix()}")
+#        with open(script_path, 'w') as f:
+#            f.write(script_string)
+#        os.system(f'sbatch {script_path.as_posix()}'
+        )
+    
 
 
 def main():
@@ -69,7 +106,7 @@ def main():
 
     # all_test = all_test[:5]
 
-    group_size = 10
+    group_size = 40
     for i, test_fid_group in enumerate(grouper(all_test, group_size, '')):
         submit_batch_fst_computation(i, test_fid_group, temp_dir)
 

@@ -22,4 +22,4 @@ python 08b_fst_parallel.py
 
 #Do afterwards
 #Rscript 08c_final_fst_formatting.R
-# source deactivate
+conda deactivate

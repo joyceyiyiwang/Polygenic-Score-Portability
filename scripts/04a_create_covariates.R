@@ -26,9 +26,8 @@ pc_df <- mutate_all(pc_df, function(x) as.numeric(x))
 df <- sex_df %>% full_join(age_df,by="IID") %>% full_join(pc_df,by="IID")
 df <- df %>%
 	filter(!is.na(age)) %>%
-# Code sex as 0 = missing, 1 = male, 2 = female, as in plink .sample files
-	mutate(sex_covar=(2-is_male)) %>%
-	mutate(sex_covar=replace(sex_covar,is.na(sex_covar),0)) %>%
+# Code sex as 0 = missing, 1 = female, 2 = male, as in plink .sample files
+	mutate(sex_covar=replace(is_male,is.na(is_male),0)) %>%
 	mutate(age_sq = age^2) %>%
 	mutate(age_sex = age*sex_covar) %>%
 	mutate(age_sq_sex = age_sq * sex_covar) %>%
