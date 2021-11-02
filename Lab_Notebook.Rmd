@@ -133,6 +133,8 @@ This is a helper file for `06a_clumping1.sh` that converts a `plink2` GLM output
 
 ### `08b_fst_parallel.py`
 
+This file creates groups of bash scripts for FST calculations. To reduce the time for running, I'm only calculating FST using genotype data on chromosome 1.
+
 ### `08b_submit_multiple_jobs.txt`
 
 ### `08c_final_fst_formatting.R`

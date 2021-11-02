@@ -3,6 +3,7 @@ import os
 import pathlib
 
 import pandas as pd
+from random import sample
 
 
 def grouper(iterable, n, fillvalue=None):
@@ -19,7 +20,7 @@ def submit_batch_fst_computation(group_label, test_fids, temp_dir):
     """
     formatted_fids = ' '.join([str(i) for i in test_fids])
     script_path = temp_dir.joinpath(f'run_{group_label}.sh')
-    if group_label % 50 == 0 or group_label % 50 == 49:
+    if group_label % 5 == 0:
         script_string = (
             "#!/bin/bash\n"
             f"#SBATCH -J fst{group_label}\n"
@@ -28,7 +29,7 @@ def submit_batch_fst_computation(group_label, test_fids, temp_dir):
             "#SBATCH -p normal\n"
             "#SBATCH -N 1\n"
             "#SBATCH -n 1\n"
-            "#SBATCH -t 6:00:00\n"
+            "#SBATCH -t 4:00:00\n"
             "#SBATCH -A Harpak-Lab-GWAS\n"
             "#SBATCH --mail-user=joyce.wang@utexas.edu\n"
             "#SBATCH --mail-type=begin\n"
@@ -38,17 +39,17 @@ def submit_batch_fst_computation(group_label, test_fids, temp_dir):
             f"for test_fid in {formatted_fids}\n"
             "do\n"
             "  $plink "
-            "  --bim ../data/ukb_merged/chr1.bim "
-            "  --bed ../data/ukb_merged/chr1.bed "
+            "  --bim ../data/ukb_merged/merged.bim "
+            "  --bed ../data/ukb_merged/merged.bed "
             "  --fam ../data/ukb_merged/merged_fst.fam "
             "  --family "
             "  --fst "
             "  --keep-cluster-names train ${test_fid} "
-            "  --out ../data/fst/fst${test_fid}\n\n"
-            "  rm ../data/fst/fst${test_fid}.fst ../data/fst/fst${test_fid}.nosex\n"
-            "  echo ${test_fid} >> ../data/fst/fst${group}.est\n"
-            "  grep 'Fst estimate:' ../data/fst/fst${test_fid}.log >> ../data/fst/fst${group}.est\n"
-            "  rm ../data/fst/fst${test_fid}.log\n"
+            "  --out ../data/fst_full/fst${test_fid}\n\n"
+            "  rm ../data/fst_full/fst${test_fid}.fst ../data/fst_full/fst${test_fid}.nosex\n"
+            "  echo ${test_fid} >> ../data/fst_full/fst${group}.est\n"
+            "  grep 'Fst estimate:' ../data/fst_full/fst${test_fid}.log >> ../data/fst_full/fst${group}.est\n"
+            "  rm ../data/fst_full/fst${test_fid}.log\n"
             "done\n"
             # Delete the script itself
             )
@@ -64,24 +65,24 @@ def submit_batch_fst_computation(group_label, test_fids, temp_dir):
             "#SBATCH -p normal\n"
             "#SBATCH -N 1\n"
             "#SBATCH -n 1\n"
-            "#SBATCH -t 6:00:00\n"
+            "#SBATCH -t 4:00:00\n"
             "#SBATCH -A Harpak-Lab-GWAS\n\n"
             "plink='/work2/06568/joyce_w/stampede2/software/plink/plink/plink'\n"
             f"group={group_label}\n"
             f"for test_fid in {formatted_fids}\n"
             "do\n"
             "  $plink "
-            "  --bim ../data/ukb_merged/chr1.bim "
-            "  --bed ../data/ukb_merged/chr1.bed "
+            "  --bim ../data/ukb_merged/merged.bim "
+            "  --bed ../data/ukb_merged/merged.bed "
             "  --fam ../data/ukb_merged/merged_fst.fam "
             "  --family "
             "  --fst "
             "  --keep-cluster-names train ${test_fid} "
-            "  --out ../data/fst/fst${test_fid}\n\n"
-            "  rm ../data/fst/fst${test_fid}.fst ../data/fst/fst${test_fid}.nosex\n"
-            "  echo ${test_fid} >> ../data/fst/fst${group}.est\n"
-            "  grep 'Fst estimate:' ../data/fst/fst${test_fid}.log >> ../data/fst/fst${group}.est\n"
-            "  rm ../data/fst/fst${test_fid}.log\n"
+            "  --out ../data/fst_full/fst${test_fid}\n\n"
+            "  rm ../data/fst_full/fst${test_fid}.fst ../data/fst_full/fst${test_fid}.nosex\n"
+            "  echo ${test_fid} >> ../data/fst_full/fst${group}.est\n"
+            "  grep 'Fst estimate:' ../data/fst_full/fst${test_fid}.log >> ../data/fst_full/fst${group}.est\n"
+            "  rm ../data/fst_full/fst${test_fid}.log\n"
             "done\n"
             # Delete the script itself
             )
@@ -92,7 +93,7 @@ def submit_batch_fst_computation(group_label, test_fids, temp_dir):
 
 
 def main():
-    temp_dir = pathlib.Path('temp_fst_path/')
+    temp_dir = pathlib.Path('temp_fst_path_full/')
     temp_dir.mkdir(exist_ok=True)
 
     all_test = (
@@ -102,11 +103,19 @@ def main():
         .tolist()
     )
 
-    # all_test = all_test[:5]
+    processed = (
+        pd.read_csv('data/fst/final_fst_full.tsv', sep='\t')
+        .[['IID']]
+        .values
+        .tolist()
+    )
 
-    group_size = 800
+    all_test = all_test - processed
+    all_test = sample(all_test, 13973-7665)
+
+    group_size = 40
     for i, test_fid_group in enumerate(grouper(all_test, group_size, '')):
-        submit_batch_fst_computation(i, test_fid_group, temp_dir)
+        submit_batch_fst_computation(i + 192, test_fid_group, temp_dir)
 
 
 if __name__ == "__main__":

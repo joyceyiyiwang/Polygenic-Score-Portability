@@ -22,6 +22,6 @@ fst_df <- fst_df %>% mutate(row_num = row_num) %>%
     arrange(IID)
                        
 fst_df %>% write_tsv('data/fst/final_fst.tsv')
-fst_df %>% write_tsv('data/phenotypes/final_fst_no_filter.tsv')
+#fst_df %>% write_tsv('data/phenotypes/final_fst_no_filter.tsv')
 
 
