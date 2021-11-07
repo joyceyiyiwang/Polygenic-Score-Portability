@@ -1,6 +1,0 @@
-# 50 jobs max at the same time
-for i in $(seq 150 191);
-do
-sbatch run_${i}.sh
-sleep 1
-done
