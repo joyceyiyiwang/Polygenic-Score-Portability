@@ -15,6 +15,7 @@ mkdir data \
       data/ambiguous_indel_snps \
       data/ukb_filtered \
       data/ukb_merged \
+      data/ukb_meta \
       data/ukb_populations #will include separated pop groups
 mkdir data/phenotypes \
       data/gwas_results \
